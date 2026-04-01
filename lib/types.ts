@@ -22,6 +22,8 @@ export interface Cliche {
 export interface RoastResult {
   veredicto: string;
   score: ScoreInfo;
+  strengths?: string[];
+  priorities?: string[];
   roastCards: PunchCard[];
   cliches: Cliche[];
   aiDetected: boolean;

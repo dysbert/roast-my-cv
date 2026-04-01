@@ -130,7 +130,11 @@ export async function POST(request: NextRequest) {
 
     let roastResult;
     try {
-      const cleaned = responseText.replace(/^```json?\s*/i, '').replace(/```\s*$/i, '').trim();
+      const cleaned = responseText
+        .replace(/^```json\s*/i, '')
+        .replace(/^```\s*/i, '')
+        .replace(/```\s*$/i, '')
+        .trim();
       roastResult = JSON.parse(cleaned);
     } catch {
       console.error('[roast] Failed to parse Claude response:', responseText.slice(0, 500));

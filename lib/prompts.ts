@@ -28,7 +28,7 @@ Analyze this CV and roast it mercilessly. Focus on:
 IMPORTANT: If the CV is genuinely excellent with few issues, do a "luxury roast" — congratulate sarcastically with minor nitpicks and give a high score.
 If the CV is empty, too short, or unreadable, respond with a special error format.
 
-Respond with ONLY a valid JSON object (no markdown, no code blocks, just raw JSON) in this exact structure:
+CRITICAL: Respond with raw JSON only. No markdown. No code blocks. No backticks. No explanation before or after. Your entire response must start with { and end with }. Here is the exact structure:
 
 {
   "veredicto": "One punchy diagnosis sentence (max 15 words, brutal/funny/sharp)",
@@ -37,6 +37,14 @@ Respond with ONLY a valid JSON object (no markdown, no code blocks, just raw JSO
     "emoji": "💀|🩹|😏|🔥",
     "label": "Archivado|Rescatable|Prometedor|Contrátame"
   },
+  "strengths": [
+    "Specific genuine strength from the CV — direct and concrete, referencing actual content"
+  ],
+  "priorities": [
+    "Priority 1: One sentence — what to fix and why it matters most for getting interviews",
+    "Priority 2: One sentence — second highest-impact fix",
+    "Priority 3: One sentence — third highest-impact fix"
+  ],
   "roastCards": [
     {
       "critique": "Specific sharp observation about a problem in the CV",
@@ -66,7 +74,9 @@ Rules:
 - aiCard is only required if aiDetected is true
 - score levels: "archived" = disaster, "rescatable" = needs major work, "prometedor" = decent with issues, "contratame" = actually good
 - veredicto must match the roast style's voice
-- ALL text in the JSON (veredicto, critique, before, after, context) must be in the DETECTED language of the CV
+- strengths: 2-3 items. Be specific and direct — reference actual CV content ("Your Leadtech bullet with 1M+ users is concrete and strong"). No generic praise ("good structure"). If the CV is genuinely weak with no redeeming qualities, still find the least-bad things and frame them honestly.
+- priorities: EXACTLY 3 items, ranked by impact on getting interviews. Each is one sentence answering "what should I fix first and why". This is the actionable takeaway after the roast.
+- ALL text in the JSON (veredicto, critique, before, after, context, strengths, priorities) must be in the DETECTED language of the CV
 
 If the CV is empty, unreadable, or too short to analyze (less than 50 words of actual content):
 {

@@ -81,6 +81,23 @@ export default function ResultsView({ result, onNewRoast }: ResultsViewProps) {
         </div>
       </div>
 
+      {/* What's working */}
+      {result.strengths && result.strengths.length > 0 && (
+        <section>
+          <h2 className="text-white font-black text-lg uppercase tracking-widest mb-4 flex items-center gap-2">
+            <span className="text-emerald-400" aria-hidden>{'// '}</span> What&apos;s Working 💪
+          </h2>
+          <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.04] divide-y divide-white/8 overflow-hidden">
+            {result.strengths.map((s, i) => (
+              <div key={i} className="px-4 py-4 flex items-start gap-3">
+                <span className="text-emerald-400 mt-0.5 flex-shrink-0">✓</span>
+                <p className="text-white/80 text-sm leading-relaxed">{s}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* The Roast */}
       <section>
         <h2 className="text-white font-black text-lg uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -92,6 +109,25 @@ export default function ResultsView({ result, onNewRoast }: ResultsViewProps) {
           ))}
         </div>
       </section>
+
+      {/* Fix these first */}
+      {result.priorities && result.priorities.length > 0 && (
+        <section>
+          <h2 className="text-white font-black text-lg uppercase tracking-widest mb-4 flex items-center gap-2">
+            <span className="text-amber-400" aria-hidden>{'// '}</span> Fix These First ⚡
+          </h2>
+          <div className="rounded-xl border border-amber-500/20 bg-amber-500/[0.04] divide-y divide-white/8 overflow-hidden">
+            {result.priorities.map((p, i) => (
+              <div key={i} className="px-4 py-4 flex items-start gap-3">
+                <span className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-[10px] font-black mt-0.5">
+                  {i + 1}
+                </span>
+                <p className="text-white/80 text-sm leading-relaxed">{p}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Clichés */}
       {result.cliches && result.cliches.length > 0 && (
@@ -124,6 +160,9 @@ export default function ResultsView({ result, onNewRoast }: ResultsViewProps) {
           <PunchCard card={result.aiCard} index={0} />
         </section>
       )}
+
+      {/* Feedback */}
+      <FeedbackSection resolvedStyle={result.resolvedStyle ?? 'unknown'} />
 
       {/* Action row */}
       <div className="flex flex-wrap gap-3 pt-2">
@@ -166,9 +205,6 @@ export default function ResultsView({ result, onNewRoast }: ResultsViewProps) {
           ↺ New Roast
         </button>
       </div>
-
-      {/* Feedback */}
-      <FeedbackSection resolvedStyle={result.resolvedStyle ?? 'unknown'} />
     </div>
   );
 }
