@@ -130,12 +130,14 @@ export async function POST(request: NextRequest) {
 
     let roastResult;
     try {
-      const cleaned = responseText
-        .replace(/^```json\s*/i, '')
-        .replace(/^```\s*/i, '')
-        .replace(/```\s*$/i, '')
-        .trim();
-      roastResult = JSON.parse(cleaned);
+      let cleanJson = responseText.trim();
+      cleanJson = cleanJson.replace(/^```[\w]*\n?/i, '').replace(/\n?```$/i, '').trim();
+      const firstBrace = cleanJson.indexOf('{');
+      const lastBrace = cleanJson.lastIndexOf('}');
+      if (firstBrace !== -1 && lastBrace !== -1) {
+        cleanJson = cleanJson.substring(firstBrace, lastBrace + 1);
+      }
+      roastResult = JSON.parse(cleanJson);
     } catch {
       console.error('[roast] Failed to parse Claude response:', responseText.slice(0, 500));
       return NextResponse.json(

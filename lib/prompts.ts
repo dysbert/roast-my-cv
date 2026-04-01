@@ -15,6 +15,8 @@ export function buildPrompt(style: Exclude<RoastStyle, 'random'>): string {
 
   return `${styleInstruction}
 
+Return raw JSON only. No markdown formatting, no code blocks, no backticks. Start your response directly with { and end with }.
+
 You are analyzing a CV/resume. First, detect the language the CV is written in, and respond ENTIRELY in that same language (if it's Spanish, respond in Spanish; if English, respond in English; etc.).
 
 Analyze this CV and roast it mercilessly. Focus on:
