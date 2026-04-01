@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { kv } from '@vercel/kv';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,7 +17,17 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     };
 
-    await kv.lpush('feedback', JSON.stringify(entry));
+    if (!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)) {
+      console.warn('[feedback] KV not configured — feedback not persisted');
+      return NextResponse.json({ ok: true });
+    }
+
+    try {
+      const { kv } = await import('@vercel/kv');
+      await kv.lpush('feedback', JSON.stringify(entry));
+    } catch (e) {
+      console.warn('[feedback] KV write failed (non-critical):', e);
+    }
 
     return NextResponse.json({ ok: true });
   } catch {

@@ -1,24 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
-import { kv } from '@vercel/kv';
 import { RoastStyle } from '@/lib/types';
 import { buildPrompt, getRandomStyle } from '@/lib/prompts';
+
+function kvAvailable() {
+  return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
+}
 
 function getToday() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 }
 
 async function checkRateLimit(ip: string): Promise<boolean> {
-  const key = `ip:${ip}:${getToday()}`;
-  const count = (await kv.get<number>(key)) ?? 0;
-  return count < 3;
+  if (!kvAvailable()) {
+    console.warn('[roast] KV not configured — skipping rate limit check');
+    return true;
+  }
+  try {
+    const { kv } = await import('@vercel/kv');
+    const key = `ip:${ip}:${getToday()}`;
+    const count = (await kv.get<number>(key)) ?? 0;
+    return count < 3;
+  } catch (e) {
+    console.warn('[roast] KV rate limit check failed, allowing request:', e);
+    return true;
+  }
 }
 
 async function recordRoastForIp(ip: string) {
-  const key = `ip:${ip}:${getToday()}`;
-  await kv.incr(key);
-  await kv.expire(key, 86400); // auto-expire after 24 hours
-  await kv.incr('totalRoasts');
+  if (!kvAvailable()) {
+    console.warn('[roast] KV not configured — skipping stat recording');
+    return;
+  }
+  try {
+    const { kv } = await import('@vercel/kv');
+    const key = `ip:${ip}:${getToday()}`;
+    await kv.incr(key);
+    await kv.expire(key, 86400);
+    await kv.incr('totalRoasts');
+  } catch (e) {
+    console.warn('[roast] KV stat recording failed (non-critical):', e);
+  }
 }
 
 function isAdminIp(ip: string): boolean {
