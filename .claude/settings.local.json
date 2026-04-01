@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@14 . --typescript --tailwind --eslint --app --no-src-dir --import-alias \"@/*\" --yes)",
+      "Bash(npm --version)",
+      "Bash(export PATH=\"/usr/local/bin:/opt/homebrew/bin:$PATH\")",
+      "Read(//usr/local/bin/**)",
+      "Read(//opt/homebrew/bin/**)",
+      "Read(//Users/dysberttovar/.nvm/versions/**)",
+      "Read(//Users/dysberttovar/roast-my-cv-app/**)",
+      "Bash(npm install:*)",
+      "Bash(ls /Users/dysberttovar/roast-my-cv/.env*)"
+    ]
+  }
+}
