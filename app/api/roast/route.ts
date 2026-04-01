@@ -1,56 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { kv } from '@vercel/kv';
 import { RoastStyle } from '@/lib/types';
 import { buildPrompt, getRandomStyle } from '@/lib/prompts';
-import { readFileSync, writeFileSync } from 'fs';
-import path from 'path';
-
-const statsPath = path.join(process.cwd(), 'data', 'stats.json');
-
-function readStats() {
-  try {
-    return JSON.parse(readFileSync(statsPath, 'utf-8'));
-  } catch {
-    return { totalRoasts: 0, ipLimits: {} };
-  }
-}
-
-function writeStats(stats: Record<string, unknown>) {
-  writeFileSync(statsPath, JSON.stringify(stats));
-}
 
 function getToday() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 }
 
-function checkRateLimit(ip: string): boolean {
-  // Returns true if the IP is allowed (under limit), false if blocked
-  const stats = readStats();
-  const ipLimits = stats.ipLimits ?? {};
-  const today = getToday();
-  const record = ipLimits[ip];
-
-  if (!record || record.date !== today) {
-    return true; // no record today → allowed
-  }
-  return record.count < 1;
+async function checkRateLimit(ip: string): Promise<boolean> {
+  const key = `ip:${ip}:${getToday()}`;
+  const count = (await kv.get<number>(key)) ?? 0;
+  return count < 3;
 }
 
-function recordRoastForIp(ip: string) {
-  const stats = readStats();
-  const ipLimits = stats.ipLimits ?? {};
-  const today = getToday();
-  const record = ipLimits[ip];
-
-  if (!record || record.date !== today) {
-    ipLimits[ip] = { count: 1, date: today };
-  } else {
-    ipLimits[ip] = { count: record.count + 1, date: today };
-  }
-
-  stats.ipLimits = ipLimits;
-  stats.totalRoasts = (stats.totalRoasts || 0) + 1;
-  writeStats(stats);
+async function recordRoastForIp(ip: string) {
+  const key = `ip:${ip}:${getToday()}`;
+  await kv.incr(key);
+  await kv.expire(key, 86400); // auto-expire after 24 hours
+  await kv.incr('totalRoasts');
 }
 
 function isAdminIp(ip: string): boolean {
@@ -83,11 +51,11 @@ export async function POST(request: NextRequest) {
     const ip = (forwarded ? forwarded.split(',')[0].trim() : null) ?? request.ip ?? '127.0.0.1';
 
     if (!isAdminIp(ip)) {
-      if (!checkRateLimit(ip)) {
+      if (!(await checkRateLimit(ip))) {
         return NextResponse.json(
           {
             error: 'RATE_LIMITED',
-            message: "You've used your free roast for today. Come back tomorrow — or upgrade for unlimited roasts. :)",
+            message: "You've used your free roasts for today. Come back tomorrow — or upgrade for unlimited roasts. :)",
           },
           { status: 429 }
         );
@@ -154,7 +122,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(roastResult, { status: 422 });
     }
 
-    recordRoastForIp(ip);
+    await recordRoastForIp(ip);
     return NextResponse.json({ ...roastResult, resolvedStyle });
   } catch (error) {
     const e = error as Error;

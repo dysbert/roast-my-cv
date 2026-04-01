@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readFileSync, writeFileSync } from 'fs';
-import path from 'path';
-
-const feedbackPath = path.join(process.cwd(), 'data', 'feedback.json');
+import { kv } from '@vercel/kv';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,22 +10,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid rating' }, { status: 400 });
     }
 
-    let entries: unknown[] = [];
-    try {
-      entries = JSON.parse(readFileSync(feedbackPath, 'utf-8'));
-    } catch {
-      entries = [];
-    }
-
-    entries.push({
+    const entry = {
       rating,
       comment: typeof comment === 'string' ? comment.slice(0, 1000) : '',
       style: style ?? 'unknown',
       anonymousId: typeof anonymousId === 'string' ? anonymousId.slice(0, 64) : '',
       timestamp: new Date().toISOString(),
-    });
+    };
 
-    writeFileSync(feedbackPath, JSON.stringify(entries, null, 2));
+    await kv.lpush('feedback', JSON.stringify(entry));
 
     return NextResponse.json({ ok: true });
   } catch {

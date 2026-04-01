@@ -78,7 +78,7 @@ export default function Home() {
     return (
       <main className="min-h-screen bg-[#0a0a0a] pb-16">
         {/* Top nav */}
-        <div className="border-b border-white/8 px-4 py-4">
+        <div className="px-4 py-4">
           <div className="max-w-3xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-[#E24B4A] font-black text-lg">🔪</span>
