@@ -130,16 +130,20 @@ export async function POST(request: NextRequest) {
 
     let roastResult;
     try {
+      console.log('[roast] Raw response first 200 chars:', responseText.substring(0, 200));
+      console.log('[roast] Response starts with backtick:', responseText.startsWith('`'));
+
       let cleanJson = responseText.trim();
-      cleanJson = cleanJson.replace(/^```[\w]*\n?/i, '').replace(/\n?```$/i, '').trim();
       const firstBrace = cleanJson.indexOf('{');
       const lastBrace = cleanJson.lastIndexOf('}');
-      if (firstBrace !== -1 && lastBrace !== -1) {
-        cleanJson = cleanJson.substring(firstBrace, lastBrace + 1);
+      if (firstBrace === -1 || lastBrace === -1) {
+        throw new Error('No JSON object found in response');
       }
+      cleanJson = cleanJson.substring(firstBrace, lastBrace + 1);
       roastResult = JSON.parse(cleanJson);
-    } catch {
+    } catch (parseError) {
       console.error('[roast] Failed to parse Claude response:', responseText.slice(0, 500));
+      console.error('[roast] Parse error:', parseError);
       return NextResponse.json(
         { error: 'PARSE_ERROR', message: 'Unexpected response format from AI.' },
         { status: 500 }
