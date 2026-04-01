@@ -64,8 +64,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing file or style' }, { status: 400 });
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      return NextResponse.json({ error: 'FILE_TOO_LARGE', message: 'PDF must be under 10MB.' }, { status: 400 });
+    if (file.size > 500 * 1024) {
+      return NextResponse.json(
+        { error: 'FILE_TOO_LARGE', message: 'Your CV is too large to process. Please try a compressed version under 500KB — a CV doesn\'t need to be that heavy either. 🔪' },
+        { status: 400 }
+      );
     }
 
     // Rate limiting
@@ -103,7 +106,7 @@ export async function POST(request: NextRequest) {
 
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 2048,
+      max_tokens: 4000,
       messages: [
         {
           role: 'user',
@@ -140,6 +143,8 @@ export async function POST(request: NextRequest) {
         throw new Error('No JSON object found in response');
       }
       cleanJson = cleanJson.substring(firstBrace, lastBrace + 1);
+      console.log('[roast] Clean JSON length:', cleanJson.length);
+      console.log('[roast] Clean JSON last 200:', cleanJson.substring(cleanJson.length - 200));
       roastResult = JSON.parse(cleanJson);
     } catch (parseError) {
       console.error('[roast] Failed to parse Claude response:', responseText.slice(0, 500));

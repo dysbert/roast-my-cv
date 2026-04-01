@@ -11,11 +11,15 @@ export default function FileUpload({ file, onFile }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleFile = (f: File) => {
-    if (f.type === 'application/pdf') {
-      onFile(f);
-    } else {
+    if (f.type !== 'application/pdf') {
       alert('Please upload a PDF file.');
+      return;
     }
+    if (f.size > 500 * 1024) {
+      alert('Your CV is too large to process. Please try a compressed version under 500KB — a CV doesn\'t need to be that heavy either. 🔪');
+      return;
+    }
+    onFile(f);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -74,7 +78,7 @@ export default function FileUpload({ file, onFile }: FileUploadProps) {
             <div className="text-white/70 text-sm font-medium">
               {isDragging ? 'Drop it here' : 'Drag & drop your CV here'}
             </div>
-            <div className="text-white/30 text-xs">or click to browse · PDF only · Max 10MB</div>
+            <div className="text-white/30 text-xs">or click to browse · PDF only · Max 500KB</div>
           </div>
         )}
         <input
