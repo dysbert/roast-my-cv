@@ -13,7 +13,21 @@ const STYLE_INSTRUCTIONS: Record<Exclude<RoastStyle, 'random'>, string> = {
 export function buildPrompt(style: Exclude<RoastStyle, 'random'>): string {
   const styleInstruction = STYLE_INSTRUCTIONS[style];
 
-  return `${styleInstruction}
+  return `STRICT OUTPUT RULES - NEVER EXCEED THESE LIMITS:
+- veredicto: maximum 15 words
+- Each strength: maximum 20 words
+- Each critique: maximum 30 words
+- Each fix suggestion: maximum 25 words
+- Each "after" rewrite: maximum 30 words
+- Each "killing word" context: maximum 15 words
+- priorities: maximum 20 words each
+- Maximum 4 roast cards (not 5)
+- Maximum 2 strengths
+- Maximum 2 killing words
+- Maximum 3 priorities
+VIOLATION OF THESE LIMITS WILL CAUSE SYSTEM FAILURE.
+
+${styleInstruction}
 
 Return raw JSON only. No markdown formatting, no code blocks, no backticks. Start your response directly with { and end with }.
 
@@ -71,12 +85,12 @@ CRITICAL: Respond with raw JSON only. No markdown. No code blocks. No backticks.
 }
 
 Rules:
-- roastCards: minimum 3, maximum 5 cards. Each must reference something SPECIFIC from the CV. Focus on the most impactful issues only.
-- cliches: include ALL clichés found, with exact context from the CV
+- roastCards: minimum 3, maximum 4 cards. Each must reference something SPECIFIC from the CV. Focus on the most impactful issues only.
+- cliches: maximum 2 items, pick the worst offenders only, with exact context from the CV
 - aiCard is only required if aiDetected is true
 - score levels: "archived" = disaster, "rescatable" = needs major work, "prometedor" = decent with issues, "contratame" = actually good
 - veredicto must match the roast style's voice
-- strengths: 2-3 items. Be specific and direct — reference actual CV content ("Your Leadtech bullet with 1M+ users is concrete and strong"). No generic praise ("good structure"). If the CV is genuinely weak with no redeeming qualities, still find the least-bad things and frame them honestly.
+- strengths: exactly 2 items. Be specific and direct — reference actual CV content ("Your Leadtech bullet with 1M+ users is concrete and strong"). No generic praise ("good structure"). If the CV is genuinely weak with no redeeming qualities, still find the least-bad things and frame them honestly.
 - priorities: EXACTLY 3 items, ranked by impact on getting interviews. Each is one sentence answering "what should I fix first and why". This is the actionable takeaway after the roast.
 - ALL text in the JSON (veredicto, critique, before, after, context, strengths, priorities) must be in the DETECTED language of the CV
 

@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     const message = await client.messages.create({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: 6000,
+      max_tokens: 3000,
       messages: [
         {
           role: 'user',
@@ -133,6 +133,15 @@ export async function POST(request: NextRequest) {
       cleanJson = cleanJson.substring(firstBrace, lastBrace + 1);
       console.log('[roast] Clean JSON length:', cleanJson.length);
       console.log('[roast] Clean JSON last 200:', cleanJson.substring(cleanJson.length - 200));
+
+      if (cleanJson.length > 5000) {
+        console.error('[roast] Response too long:', cleanJson.length);
+        return NextResponse.json(
+          { error: 'CV_TOO_COMPLEX', message: 'Your CV generated too much content. Try uploading a shorter version.' },
+          { status: 400 }
+        );
+      }
+
       roastResult = JSON.parse(cleanJson);
     } catch (parseError) {
       console.error('[roast] Failed to parse Claude response:', responseText.slice(0, 500));
