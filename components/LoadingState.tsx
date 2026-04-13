@@ -11,6 +11,7 @@ export default function LoadingState({ style }: LoadingStateProps) {
   const messages = LOADING_MESSAGES[style];
   const [index, setIndex] = useState(0);
   const [visible, setVisible] = useState(true);
+  const [progress, setProgress] = useState(8);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -23,20 +24,43 @@ export default function LoadingState({ style }: LoadingStateProps) {
     return () => clearInterval(interval);
   }, [messages.length]);
 
+  // Slowly grow the progress bar to simulate work
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 90) return p;
+        return p + Math.random() * 3;
+      });
+    }, 600);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <div className="flex flex-col items-center justify-center py-20 gap-8">
-      {/* Animated logo */}
+    <div className="flex flex-col items-center justify-center py-20 gap-8 w-full max-w-sm">
+      {/* Animated logo — ring + emoji */}
       <div className="relative">
-        <div className="w-20 h-20 rounded-full border-4 border-[#E24B4A]/30 border-t-[#E24B4A] animate-spin" />
-        <div className="absolute inset-0 flex items-center justify-center text-3xl">🔪</div>
+        {/* outer glow ring */}
+        <div className="w-24 h-24 rounded-full border-4 border-[#E24B4A]/20 border-t-[#E24B4A] animate-spin" />
+        {/* inner pulsing ring */}
+        <div className="absolute inset-2 rounded-full border border-[#E24B4A]/15 animate-ping" />
+        <div className="absolute inset-0 flex items-center justify-center text-3xl select-none">
+          🔪
+        </div>
       </div>
 
-      {/* Message */}
-      <div className="text-center max-w-sm">
+      {/* Progress bar */}
+      <div className="w-full bg-white/8 rounded-full h-1.5 overflow-hidden">
+        <div
+          className="h-full rounded-full progress-bar-shimmer transition-all duration-700 ease-out"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+
+      {/* Rotating message */}
+      <div className="text-center min-h-[2rem] flex items-center justify-center">
         <p
-          className={`text-white/80 text-lg font-medium transition-opacity duration-400 ${
-            visible ? 'opacity-100' : 'opacity-0'
-          }`}
+          className="text-white/80 text-base font-medium transition-opacity duration-400"
+          style={{ opacity: visible ? 1 : 0 }}
         >
           {messages[index]}
         </p>

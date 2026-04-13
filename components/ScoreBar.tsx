@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { ScoreLevel, SCORE_LEVELS } from '@/lib/types';
 
 interface ScoreBarProps {
@@ -13,11 +14,22 @@ export default function ScoreBar({ active }: ScoreBarProps) {
         const isActive = s.level === active;
         const isPast = i < activeIndex;
         return (
-          <div key={s.level} className="flex-1 flex flex-col items-center gap-1.5">
+          <motion.div
+            key={s.level}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: i * 0.08 }}
+            className="flex-1 flex flex-col items-center gap-1.5"
+          >
             <div
               className={`
                 w-full h-2 rounded-full transition-all
-                ${isActive ? 'bg-[#E24B4A] shadow-[0_0_8px_rgba(226,75,74,0.6)]' : isPast ? 'bg-[#E24B4A]/30' : 'bg-white/10'}
+                ${isActive
+                  ? 'bg-[#E24B4A] pulse-glow-border shadow-[0_0_8px_rgba(226,75,74,0.6)]'
+                  : isPast
+                  ? 'bg-[#E24B4A]/30'
+                  : 'bg-white/10'
+                }
               `}
             />
             <div className="flex flex-col items-center gap-0.5">
@@ -30,7 +42,7 @@ export default function ScoreBar({ active }: ScoreBarProps) {
                 {s.label}
               </span>
             </div>
-          </div>
+          </motion.div>
         );
       })}
     </div>

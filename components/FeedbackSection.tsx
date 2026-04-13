@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 
 interface FeedbackSectionProps {
   resolvedStyle: string;
@@ -63,21 +64,21 @@ export default function FeedbackSection({ resolvedStyle }: FeedbackSectionProps)
       {/* Knife rating */}
       <div className="flex gap-3" onMouseLeave={() => setHovered(0)}>
         {[1, 2, 3, 4, 5].map((n) => (
-          <button
+          <motion.button
             key={n}
             onClick={() => { setRating(n); setValidationError(''); }}
             onMouseEnter={() => setHovered(n)}
+            whileHover={{ rotate: -15, scale: 1.25 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ duration: 0.15 }}
             title={`${n} knife${n > 1 ? 's' : ''}`}
             className={`
-              text-2xl transition-all duration-150 select-none
-              ${n <= activeLevel
-                ? 'opacity-100 scale-110 drop-shadow-[0_0_6px_rgba(226,75,74,0.7)]'
-                : 'opacity-20 hover:opacity-50'
-              }
+              text-2xl select-none transition-opacity duration-150
+              ${n <= activeLevel ? 'opacity-100 drop-shadow-[0_0_6px_rgba(226,75,74,0.7)]' : 'opacity-20'}
             `}
           >
             🔪
-          </button>
+          </motion.button>
         ))}
       </div>
 

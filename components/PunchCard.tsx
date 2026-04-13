@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Copy, Check } from 'lucide-react';
 import { PunchCard as PunchCardType } from '@/lib/types';
 
 interface PunchCardProps {
@@ -18,7 +20,12 @@ export default function PunchCard({ card, index }: PunchCardProps) {
   };
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.15, ease: "easeOut" }}
+      className="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden"
+    >
       {/* Header */}
       <div className="flex items-start gap-3 p-4 border-b border-white/8">
         <div className="flex-shrink-0 w-7 h-7 rounded-full bg-[#E24B4A] flex items-center justify-center text-white text-xs font-black">
@@ -51,14 +58,9 @@ export default function PunchCard({ card, index }: PunchCardProps) {
               className="text-white/30 hover:text-white/70 transition-colors flex items-center"
             >
               {copied ? (
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
+                <Check size={14} className="text-emerald-400" />
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-                </svg>
+                <Copy size={14} />
               )}
             </button>
           </div>
@@ -67,6 +69,6 @@ export default function PunchCard({ card, index }: PunchCardProps) {
           </p>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

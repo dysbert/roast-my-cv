@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Upload, CheckCircle2, X } from 'lucide-react';
 
 interface FileUploadProps {
   file: File | null;
@@ -49,32 +50,36 @@ export default function FileUpload({ file, onFile }: FileUploadProps) {
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         className={`
-          relative flex flex-col items-center justify-center w-full h-40 rounded-xl border-2 border-dashed
-          cursor-pointer transition-all duration-200
+          relative flex flex-col items-center justify-center w-full h-40 rounded-xl cursor-pointer
+          transition-all duration-200
           ${isDragging
-            ? 'border-[#E24B4A] bg-[#E24B4A]/15'
+            ? 'border-2 border-solid border-[#E24B4A] bg-[#E24B4A]/15'
             : file
-            ? 'border-[#E24B4A]/60 bg-[#E24B4A]/10'
-            : 'border-white/20 bg-white/5 hover:border-white/40 hover:bg-white/8'
+            ? 'border-2 border-solid border-[#E24B4A]/60 bg-[#E24B4A]/5'
+            : 'border-2 border-dashed border-white/20 bg-white/5 hover:border-[#E24B4A]/60 hover:bg-[#E24B4A]/5'
           }
         `}
       >
         {file ? (
           <div className="flex flex-col items-center gap-2 px-4 text-center">
-            <div className="text-3xl">📄</div>
+            <CheckCircle2 size={28} className="text-emerald-400" />
             <div className="text-white font-medium text-sm truncate max-w-[240px]">{file.name}</div>
             <div className="text-white/40 text-xs">{(file.size / 1024).toFixed(0)} KB · PDF</div>
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); onFile(null); }}
-              className="text-xs text-[#E24B4A] hover:underline mt-1"
+              className="flex items-center gap-1 text-xs text-[#E24B4A] hover:underline mt-1"
             >
+              <X size={12} />
               Remove
             </button>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-2 text-center px-4">
-            <div className="text-3xl">{isDragging ? '🎯' : '📎'}</div>
+            <Upload
+              size={28}
+              className={`text-white/50 transition-colors duration-200 ${isDragging ? 'text-[#E24B4A]' : 'upload-icon-pulse'}`}
+            />
             <div className="text-white/70 text-sm font-medium">
               {isDragging ? 'Drop it here' : 'Drag & drop your CV here'}
             </div>
