@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Share2, Copy, Check, RotateCcw, CheckCircle, Star, Flame, Zap, MessageCircle, Heart } from 'lucide-react';
+import { Share2, Copy, Check, RotateCcw, CheckCircle, Star, Flame, Zap, MessageCircle, Heart, Bot } from 'lucide-react';
 import { RoastResult } from '@/lib/types';
 import PunchCard from './PunchCard';
 import ScoreBar from './ScoreBar';
@@ -38,6 +38,9 @@ export default function ResultsView({ result, onNewRoast }: ResultsViewProps) {
       : []),
     ...(result.cliches && result.cliches.length > 0
       ? [{ id: 'words', label: 'Words', Icon: MessageCircle }]
+      : []),
+    ...(result.aiDetected && result.aiCard
+      ? [{ id: 'ai', label: 'AI Content', Icon: Bot }]
       : []),
     { id: 'rate', label: 'Rate it', Icon: Heart },
   ];
@@ -266,7 +269,7 @@ export default function ResultsView({ result, onNewRoast }: ResultsViewProps) {
 
         {/* AI Detected */}
         {result.aiDetected && result.aiCard && (
-          <motion.section {...fadeUp(0.3)} className="scroll-mt-16">
+          <motion.section id="ai" {...fadeUp(0.3)} className="scroll-mt-16">
             <h2 className="text-white font-black text-lg uppercase tracking-widest mb-4 flex items-center gap-2">
               <span className="text-[#E24B4A]" aria-hidden>{'// '}</span> AI Content Detected 🤖
             </h2>
