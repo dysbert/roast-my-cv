@@ -71,7 +71,7 @@ CRITICAL: Respond with raw JSON only. No markdown. No code blocks. No backticks.
 }
 
 Rules:
-- roastCards: minimum 3, maximum 7 cards. Each must reference something SPECIFIC from the CV.
+- roastCards: minimum 3, maximum 5 cards. Each must reference something SPECIFIC from the CV. Focus on the most impactful issues only.
 - cliches: include ALL clichés found, with exact context from the CV
 - aiCard is only required if aiDetected is true
 - score levels: "archived" = disaster, "rescatable" = needs major work, "prometedor" = decent with issues, "contratame" = actually good
@@ -85,6 +85,8 @@ If the CV is empty, unreadable, or too short to analyze (less than 50 words of a
   "error": "UNREADABLE",
   "message": "Friendly message explaining the CV couldn't be read"
 }
+
+IMPORTANT: Be concise — quality over quantity. Keep each critique under 100 words. Keep each fix suggestion (after) under 80 words. Keep each strength under 60 words. Keep the improved answer under 100 words.
 
 The CV to analyze is attached as a PDF document above. Read it carefully before responding.`;
 }
