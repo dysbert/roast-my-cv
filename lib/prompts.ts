@@ -51,7 +51,7 @@ CRITICAL: Respond with raw JSON only. No markdown. No code blocks. No backticks.
   "score": {
     "level": "archived|rescatable|prometedor|contratame",
     "emoji": "💀|🩹|😏|🔥",
-    "label": "Archivado|Rescatable|Prometedor|Contrátame"
+    "label": "Archived|Salvageable|Promising|Hire Me"
   },
   "strengths": [
     "Specific genuine strength from the CV — direct and concrete, referencing actual content"
