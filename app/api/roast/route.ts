@@ -2,44 +2,36 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { RoastStyle } from '@/lib/types';
 import { buildPrompt, getRandomStyle } from '@/lib/prompts';
-
-function kvAvailable() {
-  return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
-}
+import { getRedis } from '@/lib/redis';
 
 function getToday() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 }
 
 async function checkRateLimit(ip: string): Promise<boolean> {
-  if (!kvAvailable()) {
-    console.warn('[roast] KV not configured — skipping rate limit check');
+  const redis = getRedis();
+  if (!redis) {
+    console.warn('[roast] Redis not configured — skipping rate limit');
     return true;
   }
   try {
-    const { kv } = await import('@vercel/kv');
-    const key = `ip:${ip}:${getToday()}`;
-    const count = (await kv.get<number>(key)) ?? 0;
-    return count < 3;
+    const key = `ratelimit:${ip}:${getToday()}`;
+    const count = await redis.incr(key);
+    if (count === 1) await redis.expire(key, 86400);
+    return count <= 3;
   } catch (e) {
-    console.warn('[roast] KV rate limit check failed, allowing request:', e);
+    console.warn('[roast] Redis rate limit check failed, allowing request:', e);
     return true;
   }
 }
 
-async function recordRoastForIp(ip: string) {
-  if (!kvAvailable()) {
-    console.warn('[roast] KV not configured — skipping stat recording');
-    return;
-  }
+async function recordRoast() {
+  const redis = getRedis();
+  if (!redis) return;
   try {
-    const { kv } = await import('@vercel/kv');
-    const key = `ip:${ip}:${getToday()}`;
-    await kv.incr(key);
-    await kv.expire(key, 86400);
-    await kv.incr('totalRoasts');
+    await redis.incr('stats:totalRoasts');
   } catch (e) {
-    console.warn('[roast] KV stat recording failed (non-critical):', e);
+    console.warn('[roast] Redis stat recording failed (non-critical):', e);
   }
 }
 
@@ -71,7 +63,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Rate limiting
     const forwarded = request.headers.get('x-forwarded-for');
     const ip = (forwarded ? forwarded.split(',')[0].trim() : null) ?? request.ip ?? '127.0.0.1';
 
@@ -92,7 +83,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
     }
 
-    // Convert PDF to base64 — let Claude read it natively
     const arrayBuffer = await file.arrayBuffer();
     const base64 = Buffer.from(arrayBuffer).toString('base64');
     console.log('[roast] base64 length:', base64.length);
@@ -101,7 +91,6 @@ export async function POST(request: NextRequest) {
       style === 'random' ? getRandomStyle() : style;
 
     const prompt = buildPrompt(resolvedStyle);
-
     const client = new Anthropic({ apiKey });
 
     const message = await client.messages.create({
@@ -134,7 +123,6 @@ export async function POST(request: NextRequest) {
     let roastResult;
     try {
       console.log('[roast] Raw response first 200 chars:', responseText.substring(0, 200));
-      console.log('[roast] Response starts with backtick:', responseText.startsWith('`'));
 
       let cleanJson = responseText.trim();
       const firstBrace = cleanJson.indexOf('{');
@@ -159,7 +147,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(roastResult, { status: 422 });
     }
 
-    await recordRoastForIp(ip);
+    await recordRoast();
     return NextResponse.json({ ...roastResult, resolvedStyle });
   } catch (error) {
     const e = error as Error;

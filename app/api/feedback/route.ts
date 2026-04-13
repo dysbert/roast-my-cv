@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getRedis } from '@/lib/redis';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,24 +10,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid rating' }, { status: 400 });
     }
 
-    const entry = {
+    const entry = JSON.stringify({
       rating,
       comment: typeof comment === 'string' ? comment.slice(0, 1000) : '',
       style: style ?? 'unknown',
       anonymousId: typeof anonymousId === 'string' ? anonymousId.slice(0, 64) : '',
-      timestamp: new Date().toISOString(),
-    };
+      timestamp: Date.now(),
+    });
 
-    if (!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)) {
-      console.warn('[feedback] KV not configured — feedback not persisted');
+    const redis = getRedis();
+    if (!redis) {
+      console.warn('[feedback] Redis not configured — feedback not persisted');
       return NextResponse.json({ ok: true });
     }
 
     try {
-      const { kv } = await import('@vercel/kv');
-      await kv.lpush('feedback', JSON.stringify(entry));
+      await redis.lpush('feedback', entry);
     } catch (e) {
-      console.warn('[feedback] KV write failed (non-critical):', e);
+      console.warn('[feedback] Redis write failed (non-critical):', e);
     }
 
     return NextResponse.json({ ok: true });

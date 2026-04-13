@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server';
+import { getRedis } from '@/lib/redis';
 
 export async function GET() {
-  if (!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)) {
-    console.warn('[stats] KV not configured — returning 0');
+  const redis = getRedis();
+  if (!redis) {
+    console.warn('[stats] Redis not configured — returning 0');
     return NextResponse.json({ totalRoasts: 0 });
   }
   try {
-    const { kv } = await import('@vercel/kv');
-    const totalRoasts = (await kv.get<number>('totalRoasts')) ?? 0;
-    return NextResponse.json({ totalRoasts });
+    const total = await redis.get<number>('stats:totalRoasts');
+    return NextResponse.json({ totalRoasts: total ?? 0 });
   } catch (e) {
-    console.warn('[stats] KV read failed:', e);
+    console.warn('[stats] Redis read failed:', e);
     return NextResponse.json({ totalRoasts: 0 });
   }
 }
