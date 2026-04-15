@@ -235,33 +235,27 @@ export default function ResultsView({ result, onNewRoast }: ResultsViewProps) {
         {result.cliches && result.cliches.length > 0 && (
           <motion.section id="words" {...fadeUp(0.25)} className="scroll-mt-16">
             <h2 className="text-white font-black text-lg uppercase tracking-widest mb-4 flex items-center gap-2">
-              <span className="text-[#E24B4A]" aria-hidden>{'// '}</span> Words Killing Your CV
+              <span className="text-[#E24B4A]" aria-hidden>{'// '}</span> Words Killing Your CV 🪦
             </h2>
-            <div className="rounded-xl border border-white/10 bg-white/[0.03] divide-y divide-white/8 overflow-hidden">
+            <div className="flex flex-wrap gap-2">
               {result.cliches.map((c, i) => (
-                <div key={i} className="px-4 py-3 flex items-start gap-3">
-                  <motion.span
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 0.3, delay: 0.3 + i * 0.06 }}
-                    className="text-[#E24B4A] text-sm mt-0.5 flex-shrink-0"
-                  >
-                    ✕
-                  </motion.span>
-                  <div>
-                    <motion.span
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.3, delay: 0.3 + i * 0.06 }}
-                      className="inline-block text-white font-bold text-sm"
-                    >
-                      &ldquo;{c.word}&rdquo;
-                    </motion.span>
-                    <p className="text-white/40 text-xs mt-0.5 leading-relaxed">
-                      context: {c.context}
-                    </p>
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.25, delay: 0.25 + Math.min(i * 0.06, 0.3) }}
+                  className="group relative"
+                >
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#E24B4A]/30 bg-[#E24B4A]/8 hover:bg-[#E24B4A]/15 hover:border-[#E24B4A]/50 transition-colors cursor-default">
+                    <span className="text-[#E24B4A] text-[10px] font-black">✕</span>
+                    <span className="text-white font-bold text-sm">&ldquo;{c.word}&rdquo;</span>
                   </div>
-                </div>
+                  {/* Tooltip on hover */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 rounded-lg bg-[#1a1a1a] border border-white/10 text-white/60 text-xs leading-relaxed whitespace-nowrap max-w-[220px] whitespace-normal opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 shadow-xl">
+                    {c.context}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1a1a1a]" />
+                  </div>
+                </motion.div>
               ))}
             </div>
           </motion.section>
