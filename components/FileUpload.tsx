@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { Upload, CheckCircle2, X } from 'lucide-react';
 
+const MAX_SIZE_MB = 1.5;
+const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
+
 interface FileUploadProps {
   file: File | null;
   onFile: (file: File | null) => void;
@@ -16,8 +19,8 @@ export default function FileUpload({ file, onFile }: FileUploadProps) {
       alert('Please upload a PDF file.');
       return;
     }
-    if (f.size > 500 * 1024) {
-      alert('Your CV is too large to process. Please try a compressed version under 500KB — a CV doesn\'t need to be that heavy either. 🔪');
+    if (f.size > MAX_SIZE_BYTES) {
+      alert(`Your CV is too large. Please upload a PDF under ${MAX_SIZE_MB}MB.`);
       return;
     }
     onFile(f);
@@ -42,6 +45,12 @@ export default function FileUpload({ file, onFile }: FileUploadProps) {
     if (selected) handleFile(selected);
   };
 
+  const handleRemove = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onFile(null);
+  };
+
   return (
     <div>
       <label
@@ -49,9 +58,11 @@ export default function FileUpload({ file, onFile }: FileUploadProps) {
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
+        aria-label={file ? `Selected file: ${file.name}. Click to change.` : 'Upload your CV PDF'}
         className={`
           relative flex flex-col items-center justify-center w-full h-40 rounded-xl cursor-pointer
           transition-all duration-200
+          focus-within:ring-2 focus-within:ring-[#E24B4A] focus-within:ring-offset-2 focus-within:ring-offset-[#0a0a0a]
           ${isDragging
             ? 'border-2 border-solid border-[#E24B4A] bg-[#E24B4A]/15'
             : file
@@ -67,8 +78,9 @@ export default function FileUpload({ file, onFile }: FileUploadProps) {
             <div className="text-white/40 text-xs">{(file.size / 1024).toFixed(0)} KB · PDF</div>
             <button
               type="button"
-              onClick={(e) => { e.preventDefault(); onFile(null); }}
-              className="flex items-center gap-1 text-xs text-[#E24B4A] hover:underline mt-1"
+              onClick={handleRemove}
+              aria-label="Remove selected file"
+              className="flex items-center gap-1 text-xs text-[#E24B4A] hover:underline mt-1 relative z-10"
             >
               <X size={12} />
               Remove
@@ -79,11 +91,12 @@ export default function FileUpload({ file, onFile }: FileUploadProps) {
             <Upload
               size={28}
               className={`text-white/50 transition-colors duration-200 ${isDragging ? 'text-[#E24B4A]' : 'upload-icon-pulse'}`}
+              aria-hidden="true"
             />
             <div className="text-white/70 text-sm font-medium">
               {isDragging ? 'Drop it here' : 'Drag & drop your CV here'}
             </div>
-            <div className="text-white/30 text-xs">or click to browse · PDF only · Max 500KB</div>
+            <div className="text-white/30 text-xs">or click to browse · PDF only · Max {MAX_SIZE_MB}MB</div>
           </div>
         )}
         <input
@@ -92,6 +105,7 @@ export default function FileUpload({ file, onFile }: FileUploadProps) {
           accept=".pdf"
           className="sr-only"
           onChange={handleInputChange}
+          aria-label="CV PDF file input"
         />
       </label>
     </div>
