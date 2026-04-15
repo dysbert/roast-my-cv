@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
+import { jsonrepair } from 'jsonrepair';
 import { RoastStyle } from '@/lib/types';
 import { buildPrompt, getRandomStyle } from '@/lib/prompts';
 import { getRedis } from '@/lib/redis';
@@ -140,6 +141,12 @@ export async function POST(request: NextRequest) {
           { error: 'CV_TOO_COMPLEX', message: 'Your CV generated too much content. Try uploading a shorter version.' },
           { status: 400 }
         );
+      }
+
+      try {
+        cleanJson = jsonrepair(cleanJson);
+      } catch (repairError) {
+        console.warn('[roast] jsonrepair failed, trying raw parse:', repairError);
       }
 
       roastResult = JSON.parse(cleanJson);
