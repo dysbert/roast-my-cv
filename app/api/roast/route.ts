@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
       console.log('[roast] Clean JSON length:', cleanJson.length);
       console.log('[roast] Clean JSON last 200:', cleanJson.substring(cleanJson.length - 200));
 
-      if (cleanJson.length > 5000) {
+      if (cleanJson.length > 8000) {
         console.error('[roast] Response too long:', cleanJson.length);
         return NextResponse.json(
           { error: 'CV_TOO_COMPLEX', message: 'Your CV generated too much content. Try uploading a shorter version.' },
