@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, Zap, Trophy, RotateCcw, FileText, Brain, Flame, CheckCircle } from 'lucide-react';
 import StyleSelector from '@/components/StyleSelector';
@@ -15,6 +15,19 @@ type AppState = 'landing' | 'loading' | 'results' | 'error' | 'rate-limited';
 export default function Home() {
   const [style, setStyle] = useState<RoastStyle | null>(null);
   const [file, setFile] = useState<File | null>(null);
+
+  // Restore last used style from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('roast:style') as RoastStyle | null;
+      if (saved) setStyle(saved);
+    } catch {}
+  }, []);
+
+  const handleStyleSelect = (s: RoastStyle) => {
+    setStyle(s);
+    try { localStorage.setItem('roast:style', s); } catch {}
+  };
   const [appState, setAppState] = useState<AppState>('landing');
   const [result, setResult] = useState<RoastResult | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
@@ -263,7 +276,7 @@ export default function Home() {
                   <div className="w-6 h-6 rounded-full bg-[#E24B4A] flex items-center justify-center text-white text-xs font-black flex-shrink-0">1</div>
                   <h2 className="text-white font-black text-base">Choose your roast style</h2>
                 </div>
-                <StyleSelector selected={style} onSelect={setStyle} />
+                <StyleSelector selected={style} onSelect={handleStyleSelect} />
               </div>
 
               {/* Step 2: Upload */}
@@ -325,13 +338,13 @@ export default function Home() {
                     Icon: FileText,
                     title: 'Upload your CV',
                     desc: 'Drop your resume as a PDF. We extract the text directly in memory — nothing is saved to disk or any database.',
-                    badge: 'PDF only · Max 10 MB',
+                    badge: 'PDF only · Max 1.5MB',
                   },
                   {
                     Icon: Zap,
                     title: 'Pick a roast style',
                     desc: 'Choose how harsh you want the feedback. From gentle nudges to full corporate takedowns. The style shapes the entire tone of the analysis.',
-                    badge: '4 styles available',
+                    badge: '5 styles available',
                   },
                   {
                     Icon: Brain,

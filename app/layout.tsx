@@ -31,6 +31,14 @@ export const metadata: Metadata = {
     title: "Roast My CV",
     description: "Your resume has never been this honest with you.",
     type: "website",
+    url: "https://roastmycv.live",
+    images: [{ url: "https://roastmycv.live/opengraph-image", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Roast My CV — AI-Powered Resume Destruction",
+    description: "Your resume has never been this honest with you.",
+    images: ["https://roastmycv.live/opengraph-image"],
   },
 };
 

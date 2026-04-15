@@ -57,9 +57,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing file or style' }, { status: 400 });
     }
 
-    if (file.size > 500 * 1024) {
+    if (file.size > 1.5 * 1024 * 1024) {
       return NextResponse.json(
-        { error: 'FILE_TOO_LARGE', message: 'Your CV is too large to process. Please try a compressed version under 500KB — a CV doesn\'t need to be that heavy either. 🔪' },
+        { error: 'FILE_TOO_LARGE', message: 'Your CV is too large to process. Please upload a PDF under 1.5MB.' },
         { status: 400 }
       );
     }
