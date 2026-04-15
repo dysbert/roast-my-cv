@@ -2,11 +2,12 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, Zap, Trophy, RotateCcw } from 'lucide-react';
+import { Upload, Zap, Trophy, RotateCcw, FileText, Brain, Flame, CheckCircle } from 'lucide-react';
 import StyleSelector from '@/components/StyleSelector';
 import FileUpload from '@/components/FileUpload';
 import LoadingState from '@/components/LoadingState';
 import ResultsView from '@/components/ResultsView';
+import StatsCounter from '@/components/StatsCounter';
 import { RoastStyle, RoastResult } from '@/lib/types';
 
 type AppState = 'landing' | 'loading' | 'results' | 'error' | 'rate-limited';
@@ -189,11 +190,15 @@ export default function Home() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4 }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#E24B4A]/15 border border-[#E24B4A]/30 text-[#E24B4A] text-xs font-bold tracking-wider uppercase mb-6"
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#E24B4A]/15 border border-[#E24B4A]/30 text-[#E24B4A] text-xs font-bold tracking-wider uppercase mb-4"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-[#E24B4A] badge-dot-pulse flex-shrink-0" />
               AI-Powered · Free · No signup
             </motion.div>
+
+            <div className="mb-6">
+              <StatsCounter />
+            </div>
 
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
@@ -218,7 +223,7 @@ export default function Home() {
             </motion.p>
           </section>
 
-          {/* How it works */}
+          {/* Mini steps */}
           <section className="px-4 pb-16 max-w-2xl mx-auto">
             <div className="grid grid-cols-3 gap-4">
               {[
@@ -295,6 +300,78 @@ export default function Home() {
               <p className="text-center text-white/20 text-xs">
                 Your CV is never stored. Processed in memory only.
               </p>
+            </div>
+          </motion.section>
+
+          {/* How it works — detailed */}
+          <motion.section
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35, ease: 'easeOut' }}
+            className="px-4 pb-24 max-w-2xl mx-auto"
+          >
+            <div className="text-center mb-10">
+              <h2 className="text-white font-black text-2xl tracking-tight mb-2">How it works</h2>
+              <p className="text-white/40 text-sm">From PDF to brutal honesty in seconds</p>
+            </div>
+
+            <div className="relative">
+              {/* Vertical connector line */}
+              <div className="absolute left-[27px] top-8 bottom-8 w-px bg-white/[0.06] hidden sm:block" />
+
+              <div className="space-y-4">
+                {[
+                  {
+                    Icon: FileText,
+                    title: 'Upload your CV',
+                    desc: 'Drop your resume as a PDF. We extract the text directly in memory — nothing is saved to disk or any database.',
+                    badge: 'PDF only · Max 10 MB',
+                  },
+                  {
+                    Icon: Zap,
+                    title: 'Pick a roast style',
+                    desc: 'Choose how harsh you want the feedback. From gentle nudges to full corporate takedowns. The style shapes the entire tone of the analysis.',
+                    badge: '4 styles available',
+                  },
+                  {
+                    Icon: Brain,
+                    title: 'Claude reads every line',
+                    desc: "Anthropic's Claude AI analyses your CV structure, wording, achievements, and red flags. It scores you across multiple dimensions and writes personalised feedback.",
+                    badge: 'Powered by Claude AI',
+                  },
+                  {
+                    Icon: Flame,
+                    title: 'Get your roast',
+                    desc: 'Receive a full breakdown: scores, a punch-card chart, section-by-section commentary, and a list of concrete fixes. Honest. Fast. Free.',
+                    badge: 'Scores · Insights · Action plan',
+                  },
+                  {
+                    Icon: CheckCircle,
+                    title: 'Actually improve',
+                    desc: 'Use the specific suggestions to rewrite your CV. Come back and roast it again until the score goes up. No account needed.',
+                    badge: 'Free · No signup',
+                  },
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -12 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.4 + i * 0.08, ease: 'easeOut' }}
+                    className="flex gap-4 items-start group"
+                  >
+                    <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center group-hover:border-[#E24B4A]/30 group-hover:bg-[#E24B4A]/5 transition-colors duration-300 z-10">
+                      <item.Icon size={22} className="text-white/50 group-hover:text-[#E24B4A]/70 transition-colors duration-300" />
+                    </div>
+                    <div className="flex-1 pt-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-white font-bold text-sm">{item.title}</h3>
+                        <span className="text-[10px] text-white/30 font-medium hidden sm:inline">{item.badge}</span>
+                      </div>
+                      <p className="text-white/40 text-xs leading-relaxed">{item.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </motion.section>
         </motion.main>
