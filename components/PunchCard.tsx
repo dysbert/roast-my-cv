@@ -23,7 +23,7 @@ export default function PunchCard({ card, index }: PunchCardProps) {
     <motion.div
       initial={{ opacity: 0, x: 24 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.15, ease: "easeOut" }}
+      transition={{ duration: 0.4, delay: Math.min(index * 0.15, 0.4), ease: "easeOut" }}
       className="rounded-xl border border-white/10 bg-white/[0.03] overflow-hidden"
     >
       {/* Header */}
