@@ -104,7 +104,7 @@ export default function ResultsView({ result, onNewRoast }: ResultsViewProps) {
     setTimeout(() => setCopiedAll(false), 2000);
   };
 
-  const shareText = `My CV just got roasted 🔥\n\nVerdict: "${result.veredicto}"\nScore: ${result.score.emoji} ${result.score.label}\n\nGet yours roasted at roastmycv.app`;
+  const shareText = `My CV just got roasted 🔥\n\nVerdict: "${result.veredicto}"\nScore: ${result.score.emoji} ${result.score.label}\n\nGet yours roasted at roastmycv.live`;
 
   const shareOnTwitter = () => {
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
@@ -113,7 +113,7 @@ export default function ResultsView({ result, onNewRoast }: ResultsViewProps) {
   };
 
   const shareOnLinkedIn = () => {
-    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://roastmycv.app')}`;
+    const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://roastmycv.live')}`;
     window.open(url, '_blank', 'noopener,noreferrer');
     setShowShareMenu(false);
   };
