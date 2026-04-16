@@ -387,6 +387,49 @@ export default function Home() {
               </div>
             </div>
           </motion.section>
+
+          {/* FAQ */}
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.6, ease: 'easeOut' }}
+            className="w-full max-w-xl mx-auto px-4 pb-16"
+          >
+            <h2 className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-6 text-center">FAQ</h2>
+            <div className="space-y-4">
+              {[
+                {
+                  q: 'Is it free?',
+                  a: '3 free roasts per day. No account needed.',
+                },
+                {
+                  q: 'Is my CV data safe?',
+                  a: 'Your CV is processed in memory and immediately discarded. We never store or share any personal data.',
+                },
+                {
+                  q: 'What does the AI check?',
+                  a: 'Weak action verbs, missing metrics, generic skills, clichés, employment gaps, and AI-generated language. You get a score, specific issues, and concrete rewrites.',
+                },
+                {
+                  q: 'What file formats are supported?',
+                  a: 'PDF only, up to 2MB. Covers exports from Word, Google Docs, Canva, and LinkedIn.',
+                },
+                {
+                  q: 'Does it work in any language?',
+                  a: 'Yes — it detects your CV language and responds in the same one. English, Spanish, French, German, Portuguese and more.',
+                },
+                {
+                  q: 'How is this different from other CV checkers?',
+                  a: 'Most checkers give generic checklists. This reads your actual content and rewrites your weakest bullet points. It also detects AI-generated language, which most tools miss.',
+                },
+              ].map(({ q, a }) => (
+                <div key={q} className="border border-white/[0.07] rounded-xl px-5 py-4 bg-white/[0.02]">
+                  <p className="text-white/80 text-sm font-medium mb-1">{q}</p>
+                  <p className="text-white/40 text-xs leading-relaxed">{a}</p>
+                </div>
+              ))}
+            </div>
+          </motion.section>
         </motion.main>
       )}
     </AnimatePresence>
