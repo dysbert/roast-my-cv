@@ -26,13 +26,42 @@ async function checkRateLimit(ip: string): Promise<boolean> {
   }
 }
 
-async function recordRoast() {
+async function recordRoast(style: string, language: string) {
   const redis = getRedis();
   if (!redis) return;
   try {
-    await redis.incr('stats:totalRoasts');
+    await Promise.all([
+      redis.incr('stats:totalRoasts'),
+      redis.incr(`stats:style:${style}`),
+      redis.incr(`stats:language:${language ?? 'unknown'}`),
+    ]);
   } catch (e) {
     console.warn('[roast] Redis stat recording failed (non-critical):', e);
+  }
+}
+
+async function trackError(type: string) {
+  const redis = getRedis();
+  if (!redis) return;
+  try {
+    await redis.incr(`stats:errors:${type}`);
+  } catch (e) {
+    console.warn('[roast] Redis error tracking failed (non-critical):', e);
+  }
+}
+
+async function trackOversizedFile(sizeBytes: number) {
+  const redis = getRedis();
+  if (!redis) return;
+  try {
+    const sizeMb = sizeBytes / (1024 * 1024);
+    const bucket = sizeMb < 3 ? '2to3mb' : sizeMb < 5 ? '3to5mb' : '5plus';
+    await Promise.all([
+      redis.incr('stats:errors:fileTooLarge'),
+      redis.incr(`stats:oversized:${bucket}`),
+    ]);
+  } catch (e) {
+    console.warn('[roast] Redis oversized tracking failed (non-critical):', e);
   }
 }
 
@@ -57,9 +86,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing file or style' }, { status: 400 });
     }
 
-    if (file.size > 1.5 * 1024 * 1024) {
+    if (file.size > 2 * 1024 * 1024) {
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+      console.log(`[roast] FILE_TOO_LARGE: ${sizeMb}MB`);
+      void trackOversizedFile(file.size);
       return NextResponse.json(
-        { error: 'FILE_TOO_LARGE', message: 'Your CV is too large to process. Please upload a PDF under 1.5MB.' },
+        { error: 'FILE_TOO_LARGE', message: 'Your CV is too large to process. Please upload a PDF under 2MB.' },
         { status: 400 }
       );
     }
@@ -153,6 +185,7 @@ export async function POST(request: NextRequest) {
     } catch (parseError) {
       console.error('[roast] Failed to parse Claude response:', responseText.slice(0, 500));
       console.error('[roast] Parse error:', parseError);
+      void trackError('PARSE_ERROR');
       return NextResponse.json(
         { error: 'PARSE_ERROR', message: 'Unexpected response format from AI.' },
         { status: 500 }
@@ -160,10 +193,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (roastResult.error === 'UNREADABLE') {
+      void trackError('UNREADABLE');
       return NextResponse.json(roastResult, { status: 422 });
     }
 
-    await recordRoast();
+    await recordRoast(resolvedStyle, roastResult.language);
     return NextResponse.json({ ...roastResult, resolvedStyle });
   } catch (error) {
     const e = error as Error;

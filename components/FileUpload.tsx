@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Upload, CheckCircle2, X } from 'lucide-react';
 
-const MAX_SIZE_MB = 1.5;
+const MAX_SIZE_MB = 2;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;
 
 interface FileUploadProps {

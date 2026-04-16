@@ -338,7 +338,7 @@ export default function Home() {
                     Icon: FileText,
                     title: 'Upload your CV',
                     desc: 'Drop your resume as a PDF. We extract the text directly in memory — nothing is saved to disk or any database.',
-                    badge: 'PDF only · Max 1.5MB',
+                    badge: 'PDF only · Max 2MB',
                   },
                   {
                     Icon: Zap,
